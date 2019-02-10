@@ -1,0 +1,106 @@
+\documentclass[10pt]{article}
+\usepackage[
+  margin=1.5cm,
+  includefoot,
+  footskip=30pt,
+]{geometry}
+
+\usepackage{layout, amsmath, ntheorem, amssymb, wasysym, stmaryrd, textgreek, bussproofs, pifont, mdframed, xcolor, hyperref}
+\hypersetup{colorlinks=true,citecolor=blue}
+\makeatletter
+\def\mathcolor#1#{\@mathcolor{#1}}
+\def\@mathcolor#1#2#3{%
+  \protect\leavevmode
+  \begingroup
+    \color#1{#2}#3%
+  \endgroup
+}
+\usepackage{enumitem}
+\setlist[1]{itemsep=-5pt}
+
+\usepackage{fontspec}
+\usepackage{polyglossia}
+
+\setdefaultlanguage{english}
+
+\setmainfont{TeX Gyre Pagella}[
+  Numbers=OldStyle,
+]
+
+% define a macro \Autoref to allow multiple references to be passed to \autoref
+\newcommand\Autoref[1]{\@first@ref#1,@}
+\def\@throw@dot#1.#2@{#1}% discard everything after the dot
+\def\@set@refname#1{%    % set \@refname to autoefname+s using \getrefbykeydefault
+    \edef\@tmp{\getrefbykeydefault{#1}{anchor}{}}%
+    \xdef\@tmp{\expandafter\@throw@dot\@tmp.@}%
+    \ltx@IfUndefined{\@tmp autorefnameplural}%
+         {\def\@refname{\@nameuse{\@tmp autorefname}s}}%
+         {\def\@refname{\@nameuse{\@tmp autorefnameplural}}}%
+}
+\def\@first@ref#1,#2{%
+  \ifx#2@\autoref{#1}\let\@nextref\@gobble% only one ref, revert to normal \autoref
+  \else%
+    \@set@refname{#1}%  set \@refname to autoref name
+    \@refname~\ref{#1}% add autoefname and first reference
+    \let\@nextref\@next@ref% push processing to \@next@ref
+  \fi%
+  \@nextref#2%
+}
+\def\@next@ref#1,#2{%
+   \ifx#2@ and~\ref{#1}\let\@nextref\@gobble% at end: print and+\ref and stop
+   \else, \ref{#1}% print  ,+\ref and continue
+   \fi%
+   \@nextref#2%
+}
+
+\makeatother
+
+% \input{glyphtounicode}
+%   \pdfgentounicode=1
+\usepackage{accsupp}
+
+\theorembodyfont{\upshape}
+\theoremseparator{.}
+\newtheorem{lem}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem*{corollary}{Corollary}
+\newcommand{\lemautorefname}{Lemma}
+\newcommand{\corollaryautorefname}{Corollary}
+\theoremheaderfont{\sc}\theorembodyfont{\upshape}
+\theoremstyle{nonumberplain}
+\theoremseparator{:}
+% \theoremsymbol{\ensuremath{\Box}}
+\newtheorem{proof}{Proof}
+
+\newcommand{\set}[1]{\{#1\}}
+\newcommand{\bra}[1]{\langle#1\rangle}
+\newcommand{\sep}{\;|\;}
+
+\usepackage[square,sort&compress,numbers]{natbib}
+
+\linespread{1.1}
+
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+
+\title{Lokum: machine transliteration from\\Ottoman Turkish to Modern Turkish}
+\author{
+  Joomy Korkut\\
+  \texttt{joomy@cs.princeton.edu}
+}
+\date{}
+\begin{document}
+\setlength{\abovedisplayskip}{-17pt}
+\setlength{\belowdisplayskip}{0pt}
+\setlength{\abovedisplayshortskip}{0pt}
+\setlength{\belowdisplayshortskip}{0pt}
+
+\maketitle
+
+\section*{Abstract}
+Parsing Turkish morphology has long been an area of interest, given the agglutinative structure of the Turkish language~\cite{solak1992parsing}.
+
+\bibliography{paper}
+\bibliographystyle{plainnat}
+
+\end{document}
