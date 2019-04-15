@@ -1,0 +1,60 @@
+-- This file has been generated from package.yaml by hpack version 0.28.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: a06fa242578d3cf18399c7efd0112d6f9b990ba1cecddc4081b5fbe7978ea50d
+
+name:           lokum
+version:        0.1.0.0
+description:    Machine translation system from Ottoman Turkish to Modern Turkish.
+homepage:       https://github.com/joom/lokum
+bug-reports:    https://github.com/joom/lokum/issues
+author:         Joomy Korkut
+maintainer:     joomy@cs.princeton.edu
+copyright:      2019 Joomy Korkut
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+extra-source-files:
+    dict.csv
+
+source-repository head
+  type: git
+  location: https://github.com/joom/lokum
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_simple
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable simple-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_simple
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , simple
+  default-language: Haskell2010
+
+test-suite simple-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_simple
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , simple
+  default-language: Haskell2010
