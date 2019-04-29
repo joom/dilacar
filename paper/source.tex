@@ -39,6 +39,7 @@
 \setmainfont{TeX Gyre Pagella}[
   Numbers=OldStyle,
 ]
+\setmonofont[Scale=0.9]{Iosevka}
 
 
 % define a macro \Autoref to allow multiple references to be passed to \autoref
@@ -91,13 +92,14 @@
 \newcommand{\sep}{\;|\;}
 \newcommand{\otto}[1]{\RLE{\ottoman{}\Large{}#1}}
 \newcommand{\word}[1]{``\emph{#1}''}
+\newcommand{\TODO}[1]{{\color{red}{[TODO: #1]}}}
 
 \linespread{1.1}
 
 % \usepackage{graphicx}
 % \graphicspath{ {./images/} }
 
-\title{Lokum: machine translation from\\Ottoman Turkish to Modern Turkish}
+\title{Morphology and lexicon-based machine translation\\of Ottoman Turkish to Modern Turkish}
 \author{
   Joomy Korkut\\
   \texttt{joomy@cs.princeton.edu}
@@ -113,17 +115,15 @@
 
 \section*{Abstract}
 We present a rule-based system to translate Ottoman Turkish to Modern Turkish.
-This system depends on morphological parsing of Ottoman words with the help of
+This system depends on partial morphological parsing of Ottoman words with the help of
 dictionaries to verify the roots, and it generates the Modern Turkish
 translation from the translated root by conjugating and declining the parsed
 morphology into its modern spelling and pronunciation.
 
 We use different kinds of dictionaries, one for loanwords from Arabic and
-Persian, and one for Modern Turkish words. The loanword dictionary is a mapping
-from the old script to the new script, while the modern dictionary is only a
-set of words. In order to search a word the modern dictionary and work around
-the ambiguous Ottoman spelling, we generate a pattern from the old spelling and
-see what words fit that pattern.
+Persian, and one for Modern Turkish words. Searching in the loanword dictionary
+is straightforward, but for the modern dictionary we derive a pattern from the
+old spelling and search using that pattern.
 
 \section{Introduction}
 
@@ -142,6 +142,21 @@ instead of the historical one.
 For example, consider the Ottoman word \otto{ايدوب} (Eng.: ``having done").
 Following the old pronunciation, this word would be transcribed \word{idüb}, while
 in Modern Turkish it should be \word{edip}.
+
+In this paper, we present a rule-based algorithm to achieve translation from
+Ottoman Turkish to Modern Turkish.  We will show that partial morphological
+parsing of Ottoman Turkish is easier because of its syntax rules that do not
+reflect pronunciation. Ottoman Turkish suffixes are often not conjugated or
+declined, which makes it easier for a computer to parse.
+Once we strip a word of its suffixes, we search for the root in our
+dictionaries, one for loanwords from Arabic and Persian, and one for Modern
+Turkish words. The loanword dictionary is a mapping
+from the old script to the new script, while the modern dictionary is only a
+set of words. In order to search a word the modern dictionary and work around
+the ambiguous Ottoman spelling, we generate a pattern from the old spelling and
+see what words fit that pattern.
+The pattern is based on what sounds that an Ottoman letter can correspond to in
+that context, and where it can take extra vowels.
 
 \subsection{Motivation}
 
@@ -219,7 +234,7 @@ transcription would be \word{papuş}.
 
 Later eras of Ottoman Turkish spell the same word as \otto{پابوج}, which
 directly transcribes to \word{pabuc}. Notice that the \emph{c} at the end becomes
-\emph{ç} in Modern Turkish. Similarly words that \emph{d}'s at the end of words
+\emph{ç} in Modern Turkish. Similarly \emph{d}'s at the end of words
 often change to \emph{t}, and \emph{b}'s at the end change to \emph{p}.
 This is a common change in Turkish grammar called
 ``fortitive assimilation"; loanwords in Modern Turkish reflect this in the
@@ -239,7 +254,7 @@ attachment rule. This letter can stand for \emph{h}, \emph{a} or \emph{e} in
 pronunciation. It only attaches to the left if the letter \otto{ہ} stands for
 \emph{h} in that context, and does not attach to the left otherwise.
 
-Consider the Arabic loanword \otto{الهه} (Eng: ``goddess''), \word{ilahe} in Modern Turkish.
+Consider the loanword from Arabic \otto{الهه} (Eng: ``goddess''), \word{ilahe} in Modern Turkish.
 The last two letters of this word are both \otto{ہ}. The former stands for \emph{h} and hence attaches to the latter, which stands for \emph{e}.
 If we were to add a suffix to this word, such as \otto{يه}, which would be read \emph{-(y)e}, for the dative case, we would see that it does not attach to the \otto{ہ}. The final word would then be \otto{الهه‌يه} (Eng:  ``to the goddess''), \word{ilaheye} in Modern Turkish.
 
@@ -254,26 +269,46 @@ a word. What we think is a word might not actually be the full word.
 
 \section{Related work}
 
-Parsing Turkish morphology has long been an area of interest, since the
-agglutinative structure of the Turkish language is an challenging research question~\cite{solak1992parsing}.
+Parsing Turkish morphology has long been an area of interest in computational
+linguistics, since the agglutinative structure of the Turkish language
+is an challenging research question. Therefore there is a long line of work in this area~\cite{hankamer1986finite, solak1992parsing, oflazer1994two, oflazer1994outline, hakkani2002statistical, eryigit2004affix, sak2007morphological, sak2009stochastic, coltekin2010freely}, among which it is possible to find both finite-state-based approaches and statistical approaches.
+Grammar of the Turkish language is unusually regular, which might have
+encouraged researchers to insist on finite-state methods.
 
-...
+Our approach in this paper is inspired from \citet{eryigit2004affix}, which
+describes a finite-state machine to parse words in reverse, by stripping
+affixes and reaching a root. Their approach does not use a lexicon, which is
+different from our approach.
+
+Our project is not the first to attempt machine translation from Ottoman Turkish to Modern Turkish. We have found at least two different projects.
+
+One of them was developed by the company Rtsoft, whose web site is not reachable anymore. They had a demo video online, which showcased features like translation from Ottoman Turkish to Modern Turkish with or without the diacritics and vice versa. However, the program was never made available or sold online.
+
+The other such project is called Dervaze, developed by \citet{dervaze}.
+Their project is very similar to ours, and they have a working demo system
+online\footnote{\url{http://dervaze.com/translate-ott/}}.
+We have tested their implementation, and we encountered some problems that we claim stem for their pipeline design:
+\begin{itemize}
+\item They choose to pick only one translation out of many possible ones. Our project will give the full range of possibilities to the user, which reduces readability of the result but increases accuracy.
+\item They skip words that fail to translate. We will always report to the user if we fail on a word.
+\item They fail on translating simple Turkish word. This is because they use a Ottoman to Turkish dictionary which might not include simpler Turkish words.
+\end{itemize}
 
 \section{Method and algorithms}
 
-...
+\TODO{gotta write}
 
 \section{Experiments and results}
 
-...
+\TODO{gotta write}
 
 \section{Future work}
 
-...
+\TODO{gotta write}
 
 \section{Conclusion}
 
-...
+\TODO{gotta write}
 
 \bibliography{paper}
 \bibliographystyle{plainnat}
