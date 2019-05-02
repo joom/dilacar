@@ -5,8 +5,10 @@
   footskip=30pt,
 ]{geometry}
 
-\usepackage{layout, amsmath, ntheorem, amssymb, wasysym, stmaryrd, textgreek, bussproofs, pifont, mdframed, xcolor, hyperref}
-\hypersetup{colorlinks=true,citecolor=blue}
+\usepackage{layout, amsmath, ntheorem, amssymb, wasysym, stmaryrd, textgreek, bussproofs, pifont, mdframed, xcolor, hyperref, multirow}
+\usepackage[super]{nth}
+% \hypersetup{colorlinks=true,citecolor=blue}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue, anchorcolor=blue}
 \makeatletter
 \def\mathcolor#1#{\@mathcolor{#1}}
 \def\@mathcolor#1#2#3{%
@@ -120,7 +122,7 @@ dictionaries to verify the roots, and it generates the Modern Turkish
 translation from the translated root by conjugating and declining the parsed
 morphology into its modern spelling and pronunciation.
 
-We use different kinds of dictionaries, one for loanwords from Arabic and
+We use two dictionaries, one for loanwords from Arabic and
 Persian, and one for Modern Turkish words. Searching in the loanword dictionary
 is straightforward, but for the modern dictionary we derive a pattern from the
 old spelling and search using that pattern.
@@ -130,11 +132,16 @@ old spelling and search using that pattern.
 Ottoman Turkish is a variant of the Turkish language that was used in the
 Ottoman Empire. This term usually refers to the prestige dialect used by the
 educated upper class. This dialect heavily used loanwords from Arabic and
-Persian, going as far as borrowing grammatical structures.~\cite{strauss2011linguistic}
-Today Ottoman Turkish can also refer to the script used to write the
+Persian, going as far as borrowing grammatical
+structures~\cite{redhouse1884simplified, hagopian1907ottoman, strauss2011linguistic}.
+Today Ottoman Turkish can refer to the script used to write the
 aforementioned prestige dialect and also the simple Turkish that was used by
 others. Both were written in Perso-Arabic script, with a few adjustments to fit
 the Turkish language.
+However, despite being used the default script from \nth{13} to \nth{20}
+century, there was no standard spelling rules for Ottoman Turkish.  In this
+project, we will prioritize the spelling that was common
+in the late \nth{19} and early \nth{20} century.
 
 When we talk about machine translation from Ottoman Turkish to Modern Turkish,
 we mean a transcription system that follows the modern pronunciation of words
@@ -152,27 +159,29 @@ Once we strip a word of its suffixes, we search for the root in our
 dictionaries, one for loanwords from Arabic and Persian, and one for Modern
 Turkish words. The loanword dictionary is a mapping
 from the old script to the new script, while the modern dictionary is only a
-set of words. In order to search a word the modern dictionary and work around
-the ambiguous Ottoman spelling, we generate a pattern from the old spelling and
-see what words fit that pattern.
+set of words. In order to search a word the modern dictionary, we generate a
+pattern from the old spelling and see what words fit that pattern.
 The pattern is based on what sounds that an Ottoman letter can correspond to in
 that context, and where it can take extra vowels.
 
 \subsection{Motivation}
 
 Ottoman Turkish is an extinct language, but all college-level Turkish
-literature students have to study it in Turkish universities.
+literature and history students have to study it in Turkish universities.
 Transcription and transliteration from Ottoman Turkish to Modern Turkish is
 still a task that Turkish studies scholars and historians have to do, or hire
 other people to do. It is an expensive task that takes a lot of labor-hours.
 Our system aims to solve this problem by automating it.
-Especially with the enhancement of OCR systems for Perso-Arabic scripts,
-this is the end goal of our project.
+We envision that our system will be used alongside optical character
+recognition systems for Perso-Arabic script, which can take a scanned image of
+text and turn it into a digital format.
+Then our system can take the digital Ottoman text and translate into Modern Turkish.
 
-Our system can also be a learning tool for people learning Ottoman Turkish.
+Our system can also be a learning tool for people studying Ottoman Turkish.
 Especially for non-native speakers of Turkish, the Ottoman dialect and script
-is a tough nut to crack. Learners have to interact with a teacher who confirms
-their transcriptions, but teachers are not available to everyone any time.
+is a tough nut to crack. Students have to interact with a teacher who confirms
+their transcriptions, but teachers are not available to everyone all the time.
+Their other option is to use an already existing transcription, which also might not be available.
 Having a system that can verify the work of learners will be quite helpful in that sense.
 
 While scholars and historians should still learn Ottoman Turkish, there will
@@ -180,9 +189,20 @@ also be a group of users who do not know Ottoman Turkish, but still want to
 understand a given text. If our system is developed enough, it will make
 primary sources available to more researchers.
 
+We preferred a rule based approach due to the lack of data in Ottoman
+Turkish. The amount of digitized texts alongside their translation or
+transcription is very limited in the first place.
+Resources in Ottoman Turkish are often either in image form, or
+untranslated.\footnote{The OpenOttoman project (\url{https://openottoman.org/})
+and Ottoman WikiSource (\url{https://wikisource.org/wiki/Osmanlıca_VikiKaynak})
+are good examples of both.}
+Furthermore, we would need enough data to account for all the grammatical
+irregularities. Unfortunately, this is not possible in the current state of
+Ottoman text digitization.
+
 \section{Challenges}
 
-Before we present the our system, it is necessary to explain the challenges of reading and translating Ottoman Turkish.
+Before we present our system, it is necessary to explain the challenges of reading and translating Ottoman Turkish.
 
 \subsection{Orthographical ambiguity}
 
@@ -192,15 +212,20 @@ script, which is the Latin alphabet with extra letters, does not correspond to
 the Ottoman script in a straightforward way.
 
 There are letters in Ottoman script that correspond to many different letters in the new script.
-For example, \otto{و} (named \word{vav}) corresponds to \emph{v}, \emph{o}, \emph{ö}, \emph{u} or \emph{ü} depending on the context.
+For example, \otto{و} corresponds to \emph{v}, \emph{o}, \emph{ö}, \emph{u} or \emph{ü} depending on the context.
 Another example is \otto{ك}, which can correspond to \emph{k}, \emph{g}, \emph{ğ}, \emph{y} or \emph{n} depending on the context.
 These are the most extreme cases, and while there are other such examples, we
 will not go through all of them here.  Given that our end goal is to generate
 Modern Turkish text, this is the kind of ambiguity we should worry about.
 
-Similarly, there are letters in the new script that can be written with multiple letters in the Ottoman script. For example, the letter \emph{s} should be written with \otto{س}, \otto{ص} or \otto{ث}, depending on the word. Since we are not generating any text in Ottoman, we are not concerned about this kind of ambiguity.
+Similarly, some letters in the new script can be written with multiple letters
+in the Ottoman script. For example, the letter \emph{s} should be written with
+\otto{س}, \otto{ص} or \otto{ث}, depending on the word. Since we are not
+generating any Ottoman Turkish text, we are not concerned about this kind of
+ambiguity.
 
 \subsection{Missing vowels}
+\label{missing-vowels}
 
 Many of the vowels in words are omitted in writing and inferred by the reader.
 For example, the Ottoman word \otto{ترلك} (Eng.: ``slipper") should be
@@ -221,12 +246,12 @@ Ottoman spelling consists of three letters: \otto{ج}, which corresponds to
 \emph{c} here with no issues, then \otto{د}, which inexplicably is doubled in
 pronunciation, and then \otto{ا}, which would normally correspond to
 \emph{a} at the end of the word, but instead is pronounced \emph{en}.
-For someone who cannot recognize this word, it is easy to mistranslate it to
-the Persian loanword \word{cüda} (Eng: ``divided"), which is spelled the same way.
+For someone who cannot recognize this word, it is easy to miss the translation above and go for
+the Persian loanword \word{cüda} (Eng: ``separated"), which is spelled the same way.
 
-The reason for the mess here is that diacritics were almost always entirely omitted in Ottoman Turkish.
+The reason for the mess here is that diacritics are almost always entirely omitted in Ottoman Turkish.
 If we were to write the same word with all the diacritics, we would write
-\otto{جِدَّاً}, which would disambiguate the translation.
+\otto{جِدًّا}, which would disambiguate the translation.
 
 For an example of a Persian loanword, consider the word \otto{پاپوش} (Eng: ``shoe'').
 In modern Turkish this would be written \word{pabuç}, but a direct
@@ -235,7 +260,10 @@ transcription would be \word{papuş}.
 Later eras of Ottoman Turkish spell the same word as \otto{پابوج}, which
 directly transcribes to \word{pabuc}. Notice that the \emph{c} at the end becomes
 \emph{ç} in Modern Turkish. Similarly \emph{d}'s at the end of words
-often change to \emph{t}, and \emph{b}'s at the end change to \emph{p}.
+often change to \emph{t}, and \emph{b}'s at the end change to
+\emph{p}.\footnote{Such last letters can change back if if the word takes a
+suffix that starts with a vowel. The word \emph{pabuç} with the dative suffix
+\emph{-a} would be \word{pabuca}. This is an example of ``consonant lenition''.}
 This is a common change in Turkish grammar called
 ``fortitive assimilation"; loanwords in Modern Turkish reflect this in the
 spelling as well, but loanwords in Ottoman Turkish keep the original spellings.
@@ -251,23 +279,28 @@ another, we can simply inspect them one at a time.
 
 However, in Ottoman Turkish specifically, the letter \otto{ہ} has a conditional
 attachment rule. This letter can stand for \emph{h}, \emph{a} or \emph{e} in
-pronunciation. It only attaches to the left if the letter \otto{ہ} stands for
+pronunciation. It only attaches to the left if the letter \otto{ہ} is read
 \emph{h} in that context, and does not attach to the left otherwise.
 
 Consider the loanword from Arabic \otto{الهه} (Eng: ``goddess''), \word{ilahe} in Modern Turkish.
-The last two letters of this word are both \otto{ہ}. The former stands for \emph{h} and hence attaches to the latter, which stands for \emph{e}.
+The last two letters of this word are both \otto{ہ}. The former is in its
+middle form \otto{ـهـ}, since it stands for \emph{h}. It attaches to the
+latter, is in its final form \otto{ـه} since it stands for \emph{e}.
 If we were to add a suffix to this word, such as \otto{يه}, which would be read \emph{-(y)e}, for the dative case, we would see that it does not attach to the \otto{ہ}. The final word would then be \otto{الهه‌يه} (Eng:  ``to the goddess''), \word{ilaheye} in Modern Turkish.
 
 In order to separate that suffix from the word so that it doesn't attach, we
-had to use a Unicode character called ``zero width non-joiner''. This character is invisible, but it prevents the characters before and after it from attaching.
+had to use a Unicode character called ``zero width non-joiner''. This character
+is invisible, but it prevents the characters before and after it from
+attaching.
 It is also common to use a space, which is visible, to achieve the same effect.
 This is a problem for our system, because Ottoman Turkish spelling normally has
-spaces used as word boundaries.  However, this usage means not every space is a
+spaces as word boundaries.  However, this usage means not every space is a
 word boundary, which means we have to take this into account when we translate
 a word. What we think is a word might not actually be the full word.
 
-
 \section{Related work}
+
+\subsection{Morphological parsing}
 
 Parsing Turkish morphology has long been an area of interest in computational
 linguistics, since the agglutinative structure of the Turkish language
@@ -280,21 +313,152 @@ describes a finite-state machine to parse words in reverse, by stripping
 affixes and reaching a root. Their approach does not use a lexicon, which is
 different from our approach.
 
-Our project is not the first to attempt machine translation from Ottoman Turkish to Modern Turkish. We have found at least two different projects.
+\subsection{Machine translation of Ottoman Turkish}
 
-One of them was developed by the company Rtsoft, whose web site is not reachable anymore. They had a demo video online, which showcased features like translation from Ottoman Turkish to Modern Turkish with or without the diacritics and vice versa. However, the program was never made available or sold online.
+Our project is not the first to attempt machine translation from Ottoman
+Turkish to Modern Turkish. We have found at least two such projects.
+
+One of them was developed by Rahmi Tura, whose web site is not
+reachable anymore. He had a demo video online, which showcased features like
+translation from Ottoman Turkish to Modern Turkish with or without the
+diacritics and vice versa. However, the program was never made available or
+sold online. In our personal communication\footnote{On April 29th, 2019, via e-mail.}, he stated that
+his system has a database that consists of approximately one million words, in
+their conjugated and declined forms. He argued that matching words in their
+whole form increases the accuracy, even though it is at the expense of
+developing a comprehensive database.
 
 The other such project is called Dervaze, developed by \citet{dervaze}.
 Their project is very similar to ours, and they have a working demo system
-online\footnote{\url{http://dervaze.com/translate-ott/}}.
+online.\footnote{\url{http://dervaze.com/translate-ott/}}
 We have tested their implementation, and we encountered some problems that we claim stem for their pipeline design:
-\begin{itemize}
+\begin{itemize}[noitemsep,topsep=0pt]
 \item They choose to pick only one translation out of many possible ones. Our project will give the full range of possibilities to the user, which reduces readability of the result but increases accuracy.
 \item They skip words that fail to translate. We will always report to the user if we fail on a word.
-\item They fail on translating simple Turkish word. This is because they use a Ottoman to Turkish dictionary which might not include simpler Turkish words.
+\item They fail on translating simple Turkish words. This is because they use a Ottoman to Turkish dictionary which might not include simpler Turkish words.
 \end{itemize}
 
 \section{Method and algorithms}
+
+\subsection{Overview}
+
+Despite the challenges mentioned above, our algorithm is based on a simple
+principle: Turkish is an agglutinative language where roots of words are not
+inflected when new suffixes are attached, and the new suffixes take forms
+according to the last syllable of the word that are attached to. We will take a
+word and perform a partial morphological parsing by break it apart to its roots
+and suffixes, then we will find the translation of the root and reconstruct the
+suffixes according to the grammar rules of Modern Turkish.
+
+Take the plural suffix for nouns, written as \emph{-ler} or \emph{-lar} in Modern
+Turkish. If we attach this suffix to the word \word{göz} (Eng: ``eye''),
+then we get \word{gözler}, because the last syllable\footnote{Syllabification
+rules of Turkish dictate that there is only one vowel per syllable.} before the
+suffix contains one of the front vowels \emph{e}, \emph{i}, \emph{ö}, \emph{ü}.
+But if we attach the same suffix to the word \word{kuş} (Eng: ``bird''),
+then we get \word{kuşlar}, because the previous syllable has one of the back
+vowels \emph{a}, \emph{ı}, \emph{ö}, \emph{ü}.
+
+The plural suffix in Ottoman Turkish, however, does not change its form. It is
+written as \otto{-لر} for all cases, only containing the letters for the
+\emph{l} and \emph{r}.
+The word \word{gözler} would be written as \otto{گوزلر} and \word{kuşlar} would
+be written as \otto{قوشلر}.
+The missing vowels problem we described in \autoref{missing-vowels} work in our
+advantage here; the computer can just look for the \otto{-لر} at the end, strip it off, and
+use the rest as an hypothetical root.
+
+An hypothetical root would be looked up in the dictionaries, and if there is
+not entry for that, we would continue to look for more suffixes. Even if there
+is an entry, it is possible that a word has multiple translations in Modern
+Turkish, so we should still look for more suffixes.
+
+There are a few corner cases in the \otto{-لر} (\emph{-ler}, \emph{-lar})
+example. One of them is that the ending with this letter sequence does not
+necessarily mean it is a plural suffix. It is possible to have words that end
+with the same letters that have no suffixes. Consider the loanword from French
+\otto{پوپولر} (Eng: ``popular''), which translates to Modern Turkish
+\word{popüler}. We can try to parse the ending as a suffix and search for the
+beginning in the dictionary, which will fail. However, our program can find a
+word in one our dictionaries that matches either directly or through a pattern,
+which lets the program recover from the previous state.
+
+% will have an entry
+% for \otto{پوپولر} in one of our dictionaries,
+
+The other corner case is that \otto{-لر} (\emph{-ler}, \emph{-lar}) is not just
+the plural suffix for nouns. The \nth{3} person plural suffix in verb
+conjugations is also of the same form. For example, the word \otto{گلدى} (Eng: ``he/she/it came'', Tur: \word{geldi}) can take the same suffix and become \otto{گلديلر} (Eng: ``they came'', Tur: \word{geldiler}).
+Here the fact that our morphological parsing is partial saves us.
+When we are parsing the suffixes our goal is not to produce a full
+morphological structure like \emph{göz<n><pl>} for \word{gözler} or
+\emph{gel<v><3p>} for \word{geldiler}. Our goal is merely to identify what
+suffixes we have so that we can reconstruct them, we are not interested in what
+function they have in the grammar.
+
+Most suffixes in Ottoman Turkish generally have only one form, even though their Modern Turkish equivalents might have many more.\footnote{This is because the Modern Turkish spelling closely reflects the pronunciation.} For example, the suffix of the direct past tense \otto{-دى} in Ottoman Turkish has 8 different forms in Modern Turkish:
+\emph{-dı}, \emph{-di}, \emph{-du}, \emph{-dü}, \emph{-tı}, \emph{-ti}, \emph{-tu} and \emph{-tü}.
+Notwithstanding, there are exceptions to these cases. Rarely it is possible to
+see \otto{-دى} as \otto{-دو}, \otto{-تى} or \otto{-تو}, which correspond to the
+forms in Modern Turkish. This is due to the lack of standardization in Ottoman
+Turkish; a writer's spelling depends on the era they live in and also their
+``idiography", i.e.\ an individual's unique way of spelling.
+
+\subsection{Dictionary lookup and pattern generation}
+
+As we described earlier, our program will use two kinds of dictionaries to look
+up words. The first one is a dictionary that maps Ottoman Turkish spellings to
+Modern Turkish spellings, it is basically a table with two columns.
+It will have a mapping from \otto{الهه} to \word{ilâhe}, from \otto{جدا} to
+\word{cidden} and so on. The second dictionary is a table with only one column,
+it is simply a list of words in Modern Turkish.
+
+The first dictionary mostly consists of loanwords from Arabic and Persian, since
+they are spelled in Ottoman Turkish the same way they are spelled in the
+original language, even when their pronunciation is changed in Turkish.
+Therefore, unless there is a dictionary the program can look up from, it will
+get those word wrong.
+Consider the word \otto{چهارشنبه} (Eng: ``wednesday''). It is spelled
+\word{çarşamba} Modern Turkish, but a direct transcription would be
+\word{çiharşenbe}.
+
+For word that are originally Turkish, there is a much higher chance that we can
+get the right translation from the spelling, despite the ambiguities.
+We will generate a regular expression from the Ottoman spelling and match it
+against the entries in our second dictionary.
+
+% Consider the word \otto{آرابه} (Eng: ``car'' or ``cart''). In Modern Turkish
+% this is translated to \word{araba}.
+Consider the word \otto{گوز} (Eng: ``eye'', Tur: \word{göz}) that we mentioned above.
+There are three letters in this word: % \otto{گ}, \otto{و} and \otto{ز}.
+\begin{enumerate}[noitemsep,topsep=0pt]
+  \item \otto{گ} only corresponds to one letter in Modern Turkish, which is
+    \emph{g}. Hence our pattern for this letter only consists of \texttt{/g/}.
+  \item \otto{و} can correspond to five letters in Modern Turkish, \emph{v},
+    \emph{o}, \emph{ö}, \emph{u} or \emph{ü}. The last four of these are
+    vowels, and if \otto{و} here stands for a vowel, then it does not imply the
+    possible existence of another vowel before or after it. However, if
+    \otto{و} stands for \emph{v} here, it may or may not be followed or
+    preceded by a vowel, and we have to account for that vowel in our pattern.
+
+    Hence our pattern for this letter would be
+    \texttt{/(((a|e|i|ı|o|ö|u|ü)?v(a|e|i|ı|o|ö|u|ü)?)|o|ö|u|ü)/}.
+    We have optional vowel patterns before and after the \emph{v}, or this
+    letter might just be standing for \emph{o}, \emph{ö}, \emph{u} or \emph{ü}
+\item \otto{ز} only corresponds to one letter in Modern Turkish, which is
+    \emph{z}. Hence our pattern for this letter only consists of \texttt{/z/}.
+\end{enumerate}
+
+Therefore, our final pattern for this word will be
+\texttt{/\^{}g(((a|e|i|ı|o|ö|u|ü)?v(a|e|i|ı|o|ö|u|ü)?)|o|ö|u|ü)z\$/}.
+
+Searching with this pattern in the modern dictionary, we will find two matching
+words: \word{göz} and \word{güz}. This ambiguity is inherent to the Ottoman
+script, and there is not much we can do about that. Our program will take this
+root and decline the suffixes if there are any, and display both translations
+to the end user.
+
+\subsection{Walking through examples}
 
 \TODO{gotta write}
 
@@ -312,5 +476,12 @@ We have tested their implementation, and we encountered some problems that we cl
 
 \bibliography{paper}
 \bibliographystyle{plainnat}
+
+% \onecolumn
+\clearpage
+\appendix
+\section{Appendix}
+\input{alphabet}
+
 
 \end{document}
