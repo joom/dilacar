@@ -34,7 +34,7 @@ library
       base >=4.7 && <5
   default-language: Haskell2010
 
-executable simple-exe
+executable lokum-exe
   main-is: Main.hs
   other-modules:
       Paths_lokum
@@ -43,10 +43,10 @@ executable simple-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , simple
+    , lokum
   default-language: Haskell2010
 
-test-suite simple-test
+test-suite lokum-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:

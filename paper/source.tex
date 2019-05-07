@@ -138,9 +138,10 @@ Today Ottoman Turkish can refer to the script used to write the
 aforementioned prestige dialect and also the simple Turkish that was used by
 others. Both were written in Perso-Arabic script, with a few adjustments to fit
 the Turkish language.
-However, despite being used the default script from \nth{13} to \nth{20}
-century, there was no standard spelling rules for Ottoman Turkish.  In this
-project, we will prioritize the spelling that was common
+However, despite being used as the default script from \nth{13} to \nth{20}
+century, there were no standard spelling rules for Ottoman Turkish.
+
+In this project, we will prioritize the spelling that was common
 in the late \nth{19} and early \nth{20} century.
 
 When we talk about machine translation from Ottoman Turkish to Modern Turkish,
@@ -173,7 +174,7 @@ still a task that Turkish studies scholars and historians have to do, or hire
 other people to do. It is an expensive task that takes a lot of labor-hours.
 Our system aims to solve this problem by automating it.
 We envision that our system will be used alongside optical character
-recognition systems for Perso-Arabic script, which can take a scanned image of
+recognition (OCR) systems for Perso-Arabic script, which can take a scanned image of
 text and turn it into a digital format.
 Then our system can take the digital Ottoman text and translate into Modern Turkish.
 
@@ -187,7 +188,10 @@ Having a system that can verify the work of learners will be quite helpful in th
 While scholars and historians should still learn Ottoman Turkish, there will
 also be a group of users who do not know Ottoman Turkish, but still want to
 understand a given text. If our system is developed enough, it will make
-primary sources available to more researchers.
+primary sources available to more researchers.\footnote{Given that they are
+available in digital format. OCR systems only work well on printed
+(\emph{matbu}) material; other writing styles and handwriting require a
+different kind of expertise.}
 
 We preferred a rule based approach due to the lack of data in Ottoman
 Turkish. The amount of digitized texts alongside their translation or
@@ -230,7 +234,7 @@ ambiguity.
 Many of the vowels in words are omitted in writing and inferred by the reader.
 For example, the Ottoman word \otto{ترلك} (Eng.: ``slipper") should be
 translated to \word{terlik}.
-However, the Ottoman spelling, consists of only four letter, which are the
+However, the Ottoman spelling consists of only four letters, which are the
 consonants \emph{t}, \emph{r}, \emph{l} and \emph{k}.
 The vowels \emph{e} and \emph{i} are inferred by the reader, with help from
 their handle on the vocabulary and their experience with the language.
@@ -253,9 +257,9 @@ The reason for the mess here is that diacritics are almost always entirely omitt
 If we were to write the same word with all the diacritics, we would write
 \otto{جِدًّا}, which would disambiguate the translation.
 
-For an example of a Persian loanword, consider the word \otto{پاپوش} (Eng: ``shoe'').
-In modern Turkish this would be written \word{pabuç}, but a direct
-transcription would be \word{papuş}.
+For an example of a Persian loanword, consider \otto{پاپوش} (Eng: ``shoe'').
+A direct transcription would be \word{papuş},
+but in Modern Turkish this would be written \word{pabuç}.
 
 Later eras of Ottoman Turkish spell the same word as \otto{پابوج}, which
 directly transcribes to \word{pabuc}. Notice that the \emph{c} at the end becomes
@@ -270,7 +274,9 @@ spelling as well, but loanwords in Ottoman Turkish keep the original spellings.
 
 \subsection{Ambiguous word boundaries}
 
-Not every letter in the Ottoman script attach to one another.
+The Ottoman script is written from right to left, by attaching letters to each other.
+However, not every letter attach to one another.
+% Not every letter in the Ottoman script attach to one another.
 The letters \otto{ا}, \otto{د}, \otto{ذ}, \otto{ر}, \otto{ز}, \otto{ژ} and \otto{و}
 only attach to the letter before (on the right), and not the letter after (on the left).
 This is already handled perfectly by digital systems. When we are inspecting a
@@ -392,7 +398,7 @@ conjugations is also of the same form. For example, the word \otto{گلدى} (En
 Here the fact that our morphological parsing is partial saves us.
 When we are parsing the suffixes our goal is not to produce a full
 morphological structure like \emph{göz<n><pl>} for \word{gözler} or
-\emph{gel<v><3p>} for \word{geldiler}. Our goal is merely to identify what
+\emph{gel<v><past><3p>} for \word{geldiler}. Our goal is merely to identify what
 suffixes we have so that we can reconstruct them, we are not interested in what
 function they have in the grammar.
 
@@ -420,7 +426,7 @@ Therefore, unless there is a dictionary the program can look up from, it will
 get those word wrong.
 Consider the word \otto{چهارشنبه} (Eng: ``wednesday''). It is spelled
 \word{çarşamba} Modern Turkish, but a direct transcription would be
-\word{çiharşenbe}.
+\word{çeharşenbe}.
 
 For word that are originally Turkish, there is a much higher chance that we can
 get the right translation from the spelling, despite the ambiguities.
