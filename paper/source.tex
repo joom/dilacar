@@ -25,6 +25,9 @@
 \titlespacing{\subsection}{0pt}{*0}{*0}
 \titlespacing{\subsubsection}{0pt}{*0}{*0}
 
+\usepackage{fancyhdr}
+\usepackage[us,12hr]{datetime}
+
 \usepackage[square,sort&compress,numbers]{natbib}
 \usepackage{fontspec}
 \usepackage{polyglossia}
@@ -86,7 +89,6 @@
 \theoremheaderfont{\sc}\theorembodyfont{\upshape}
 \theoremstyle{nonumberplain}
 \theoremseparator{:}
-% \theoremsymbol{\ensuremath{\Box}}
 \newtheorem{proof}{Proof}
 
 \newcommand{\set}[1]{\{#1\}}
@@ -101,10 +103,11 @@
 % \usepackage{graphicx}
 % \graphicspath{ {./images/} }
 
-\title{Morphology and lexicon-based machine translation\\of Ottoman Turkish to Modern Turkish}
+\title{Morphology and lexicon-based machine translation\\of Ottoman Turkish to Modern Turkish\footnote{Draft compiled on \today\ at \currenttime.}}
 \author{
   Joomy Korkut\\
-  \texttt{joomy@cs.princeton.edu}
+  \normalsize Princeton University\\
+  \normalsize \texttt{joomy@cs.princeton.edu}
 }
 \date{}
 \begin{document}
@@ -479,6 +482,12 @@ to the end user.
 \section{Conclusion}
 
 \TODO{gotta write}
+
+\section*{Acknowledgments}
+
+We would like to thank Nilüfer Hatemi and Duygu Coşkuntuna
+from the Near Eastern Studies department at Princeton
+for their comments on the draft of this paper.
 
 \bibliography{paper}
 \bibliographystyle{plainnat}
