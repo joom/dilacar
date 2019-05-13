@@ -7,6 +7,7 @@ import Data.List
 import qualified Orthography as Ortho
 import qualified Morphology as Morph
 import qualified Ottoman as Otto
+import qualified Dictionary as Dict
 
 type Result = [String]
 

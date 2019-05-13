@@ -138,6 +138,9 @@ data OttoText =
   | Punctuation String
   deriving (Show, Eq)
 
+baseEq :: [OttoModified] -> [OttoModified] -> Bool
+baseEq xs ys = (map baseOtto xs) == (map baseOtto ys)
+
 instance Parse OttoText where
   parse = (Word <$> (spaces *> many1 (parse @OttoModified) <* spaces))
       <|> (Punctuation <$> (string "." <|> string ","))
