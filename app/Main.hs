@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import Lokum
 
 main :: IO ()
 main = interact (show . entry)

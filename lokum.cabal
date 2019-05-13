@@ -1,9 +1,3 @@
--- This file has been generated from package.yaml by hpack version 0.28.2.
---
--- see: https://github.com/sol/hpack
---
--- hash: 4ce82b2469e58ab9730d26386f1437930342f1ac3274b0877dfca91a2db9cfb4
-
 name:           lokum
 version:        0.1.0.0
 description:    Machine translation system from Ottoman Turkish to Modern Turkish.
@@ -25,13 +19,14 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      Lokum
   other-modules:
       Paths_lokum
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      base >=4.7 && <5,
+      parsec
   default-language: Haskell2010
 
 executable lokum-exe
