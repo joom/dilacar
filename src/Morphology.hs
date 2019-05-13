@@ -1,5 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE ViewPatterns #-}
 module Morphology where
 
 import Data.List
@@ -29,8 +30,11 @@ suffixOttoman = \case
   Ecek -> [[Cim, Kef], [Cim, Kaf]]
 
 morphParse :: [OttoModified] -> ([OttoModified], [Suffix])
-morphParse letters =
-  undefined
-    -- case find (any (`isSuffixOf` letters) . suffixOttoman) allSuffixes of
-    --   Just suf -> (letters, [suf])
-    --   Nothing -> (letters, [])
+morphParse ((`endsWith` [Lam, Re])  -> Just x) = (x, [Ler])
+morphParse ((`endsWith` [Kef])      -> Just x) = (x, [In])
+morphParse ((`endsWith` [Nef])      -> Just x) = (x, [In])
+morphParse ((`endsWith` [Dal, Ye])  -> Just x) = (x, [Di])
+morphParse ((`endsWith` [Mim, Şın]) -> Just x) = (x, [Miş])
+morphParse ((`endsWith` [Cim, Kef]) -> Just x) = (x, [Ecek])
+morphParse ((`endsWith` [Cim, Kaf]) -> Just x) = (x, [Ecek])
+morphParse letters = (letters, [])

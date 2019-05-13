@@ -2,6 +2,9 @@
 {-# LANGUAGE TypeApplications #-}
 module Ottoman where
 
+import Data.List
+import Data.List.Extra
+
 import Text.Parsec.String (Parser(..))
 import Text.Parsec ((<|>), string, many, many1, spaces)
 import qualified Text.Parsec
@@ -115,6 +118,9 @@ data OttoModified =
 baseOtto :: OttoModified -> Otto
 baseOtto (PureOtto x) = x
 baseOtto (ModifiedOtto _ x) = x
+
+endsWith :: [OttoModified] -> [Otto] -> Maybe [OttoModified]
+endsWith xs ys = (map fst . zip xs) <$> (stripSuffix ys (map baseOtto xs))
 
 instance Parse OttoModified where
   parse =
