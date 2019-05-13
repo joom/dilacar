@@ -2,14 +2,20 @@
 {-# LANGUAGE TypeApplications #-}
 module Lokum where
 
-import Orthography
-import Morphology
-import Ottoman
+import Data.List
+
+import qualified Orthography as Ortho
+import qualified Morphology as Morph
+import qualified Ottoman as Otto
 
 type Result = [String]
 
-word :: String -> Result
-word w = undefined
+translate :: Otto.OttoText -> Result
+translate (Otto.Punctuation s) = [s]
+translate (Otto.Word letters) =
+  error . show $ Morph.morphParse letters
 
 entry :: String -> [Result]
-entry s = map word (words s)
+entry s = case Otto.runParser s of
+            Left err -> []
+            Right ws -> map translate ws

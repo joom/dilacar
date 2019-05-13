@@ -2,7 +2,7 @@ module Orthography where
 
 import qualified Data.Char as C
 
-alphabet :: String
+alphabet :: [Char]
 alphabet = "abcçdefgğhıijklmnoöprsştuüvyz"
 
 toUpper :: Char -> Char
@@ -31,20 +31,26 @@ nonContinuant = "pçtk"
 fortis :: [Char]
 fortis = continuant ++ nonContinuant
 
+-- | "ünsüzler"
 consonants :: [Char]
 consonants = lenis ++ fortis
 
+-- | "ince ünlüler"
 front :: [Char]
 front = "eiöü"
 
+-- | "kalın ünlüler"
 back :: [Char]
 back = "aıou"
 
+-- | "yuvarlak ünlüler"
 rounded :: [Char]
 rounded = "öüou"
 
+-- | "düz ünlüler"
 unrounded :: [Char]
 unrounded = "eiaı"
 
+-- | "ünlüler"
 vowels :: [Char]
 vowels = front ++ back
