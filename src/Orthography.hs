@@ -107,4 +107,5 @@ shouldBeFortition s =
     then Just $ init s ++ [lenition (last s)]
     else Nothing
 
-
+needsFortis :: String -> Bool
+needsFortis s = last s `elem` nonContinuant

@@ -82,6 +82,7 @@ instance Parse Otto where
       <|> (string "و" *> pure Vav)
       <|> (string "ه" *> pure He)
       <|> (string "ی" *> pure Ye)
+      <|> (string "ى" *> pure Ye)
       <|> (string "ي" *> pure Ye)
 
 data Mod =
@@ -95,6 +96,7 @@ data Mod =
   | Fethateyn -- ^ Tenvin: also known as "iki üstün"
   | Kesrateyn -- ^ Tenvin: also known as "iki esre"
   | Dammeteyn -- ^ Tenvin: also known as "iki ötre"
+  | NonJoiner -- ^ zero-width non-joiner \8204
   deriving (Show, Eq, Enum)
 
 instance Parse Mod where
@@ -110,6 +112,7 @@ instance Parse Mod where
       <|> (string "\1620" *> pure Hemze) -- above
       <|> (string "\1621" *> pure Hemze) -- below
       <|> (string "\1764" *> pure Medde) -- small high
+      <|> (string "\8204" *> pure NonJoiner)
 
 data OttoModified =
     PureOtto Otto
@@ -128,6 +131,7 @@ instance Parse OttoModified where
     -- Exception cases for the special Unicode characters
     -- that stand for an Ottoman leter with a modification
           (string "\1570" *> pure (ModifiedOtto [Medde] Elif))
+      <|> (string "آ" *> pure (ModifiedOtto [Medde] Elif))
       <|> (string "\1571" *> pure (ModifiedOtto [Hemze] Elif)) -- Hemze above elif
       <|> (string "\1573" *> pure (ModifiedOtto [Hemze] Elif)) -- Hemze below elif
       <|> (do otto <- parse @Otto

@@ -1,9 +1,13 @@
 module Main where
 
+import Data.List
+
 import Lokum
 
 main :: IO ()
-main = do
-  s <- getContents
+main = getContents >>= run
+
+run :: String -> IO ()
+run s = do
   res <- entry s
-  putStrLn $ show res
+  putStrLn $ intercalate "\n" (map (intercalate ", ") res)

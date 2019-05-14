@@ -1,11 +1,15 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE FlexibleInstances #-}
 module Pattern where
 
 import Text.Regex.Applicative
 
 import Ottoman
 import Orthography
+
+instance Semigroup a => Semigroup (RE Char a) where
+  x <> y = pure (<>) <*> x <*> y
 
 ottoPat :: Otto -> [String]
 ottoPat = \case
@@ -49,18 +53,17 @@ alt xs = foldr1 (<|>) (map string xs)
 alt' :: [Char] -> RE Char String
 alt' xs = foldr1 (<|>) (map (string . (:[])) xs)
 
-pat :: OttoModified -> RE Char String
-pat (PureOtto base) = foldr1 (<|>) (map string opts)
-  where opts = ottoPat base
-        cons = filter isConsonant opts
-        vows = filter isVowel opts
-pat (ModifiedOtto mods base) = foldr1 (<|>) (map string opts)
-  where opts = ottoPat base
-        cons = filter isConsonant opts
-        vows = filter isVowel opts
+opt x = x <|> string ""
+anyVowel = alt' vowels
 
-cat :: Semigroup a => RE Char a -> RE Char a -> RE Char a
-cat x y = pure (<>) <*> x <*> y
+pat :: OttoModified -> RE Char String
+pat (PureOtto base) = pat (ModifiedOtto [] base)
+pat (ModifiedOtto mods base) = cons <|> vows
+  where opts = ottoPat base
+        cons = foldr (\x acc -> (opt anyVowel <> x <> opt anyVowel) <|> acc)
+                     empty (map string (filter isConsonant opts))
+        vows = foldr (<|>) empty (map string (filter isVowel opts))
+        fin = cons <|> vows
 
 generateRegex :: [OttoModified] -> RE Char String
 generateRegex = go True
@@ -68,9 +71,9 @@ generateRegex = go True
     go :: Bool -> [OttoModified] -> RE Char String
     -- Elif with Medde in the beginning of a word is "a"
     go True (ModifiedOtto mods Elif : rest) | Medde `elem` mods =
-       string "a" `cat` go False rest
+       string "a" <> go False rest
     -- Elif with a following vowelish Ottoman letter is probably a vowel
     go True letters@((baseOtto -> Elif) : (baseOtto -> following) : rest) =
-          alt (filter isVowel (ottoPat following)) `cat` go False rest
+          alt (filter isVowel (ottoPat following)) <> go False rest
       <|> go False letters
-    go isBeginning letters = foldr1 cat (map pat letters)
+    go isBeginning letters = foldr1 (<>) (map pat letters)

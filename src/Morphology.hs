@@ -16,6 +16,7 @@ data Suffix =
   | Miş -- miş, mış, muş, müş
   | Ecek -- ecek, acak
   deriving (Show, Eq, Enum, Bounded)
+  -- TODO a lot more suffixes to come!
 
 allSuffixes :: [Suffix]
 allSuffixes = [minBound .. maxBound]
@@ -53,11 +54,30 @@ reconstructOne Ler root =
     Just False -> root ++ "lar"
     _ -> root ++ "ler"
 reconstructOne Den root =
-  case (`elem` front) <$> lastVowel root of
-    Just False -> root ++ "dan"
-    _ -> root ++ "den"
+  let isFront = (`elem` front) <$> lastVowel root in
+  case (isFront, needsFortis root) of
+    (Just False, True) -> root ++ "tan"
+    (Just False, False) -> root ++ "dan"
+    (_, True) -> root ++ "ten"
+    (_, False) -> root ++ "den"
 reconstructOne Miş root =
-  case (`elem` front) <$> lastVowel root of
-    Just False -> root ++ "mış"
-    _ -> root ++ "miş"
-reconstructOne _ root = error "Unimplemented suffix"
+  let isFront = (`elem` front) <$> lastVowel root in
+  let isRounded = (`elem` rounded) <$> lastVowel root in
+  case (isRounded, isFront) of
+    (Just False, Just False) -> root ++ "mış"
+    (Just False, Just True) -> root ++ "miş"
+    (Just True, Just False) -> root ++ "muş"
+    (Just True, Just True) -> root ++ "müş"
+reconstructOne Di root =
+  let isFront = (`elem` front) <$> lastVowel root in
+  let isRounded = (`elem` rounded) <$> lastVowel root in
+  case (isRounded, isFront, needsFortis root) of
+    (Just False, Just False, True) -> root ++ "tı"
+    (Just False, Just False, False) -> root ++ "dı"
+    (Just False, Just True, True) -> root ++ "ti"
+    (Just False, Just True, False) -> root ++ "di"
+    (Just True, Just False, True) -> root ++ "tu"
+    (Just True, Just False, False) -> root ++ "du"
+    (Just True, Just True, True) -> root ++ "tü"
+    (Just True, Just True, False) -> root ++ "dü"
+reconstructOne _ root = error "Unimplemented suffix" -- TODO
