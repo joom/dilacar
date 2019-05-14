@@ -1,6 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeApplications #-}
-module Lokum where
+module Dilacar where
 
 import Data.List
 

@@ -103,7 +103,8 @@
 % \usepackage{graphicx}
 % \graphicspath{ {./images/} }
 
-\title{Morphology and lexicon-based machine translation\\of Ottoman Turkish to Modern Turkish\footnote{Draft compiled on \today\ at \currenttime.}}
+% \title{Morphology and lexicon-based machine translation\\of Ottoman Turkish to Modern Turkish\footnote{Version compiled on \today\ at \currenttime.}}
+\title{Morphology and lexicon-based machine translation\\of Ottoman Turkish to Modern Turkish}
 \author{
   Joomy Korkut\\
   \normalsize Princeton University\\
@@ -417,12 +418,10 @@ Turkish; a writer's spelling depends on the era they live in and also their
 
 As we described earlier, our program will use two kinds of dictionaries to look
 up words. The first one is a dictionary that maps Ottoman Turkish spellings to
-Modern Turkish spellings, it is basically a table with two columns.
+Modern Turkish spellings\footnote{\url{http://ekitapgunlugu.blogspot.com/2013/03/osmanlca-sozluk-veritaban.html}. It is a combination of ten different dictionaries compiled by an unnamed blogger.}, it is basically a table with two columns.
 It will have a mapping from \otto{الهه} to \word{ilâhe}, from \otto{جدا} to
 \word{cidden} and so on. The second dictionary is a table with only one column,
-it is simply a list of words in Modern Turkish.
-
-\TODO{Cite the dictionary sources.}
+it is simply a list of words in Modern Turkish borrowed from the Zemberek project~\cite{akin2007zemberek}.
 
 The first dictionary mostly consists of loanwords from Arabic and Persian, since
 they are spelled in Ottoman Turkish the same way they are spelled in the

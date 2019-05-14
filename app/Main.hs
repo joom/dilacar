@@ -2,7 +2,7 @@ module Main where
 
 import Data.List
 
-import Lokum
+import Dilacar
 
 main :: IO ()
 main = getContents >>= run

@@ -21,9 +21,6 @@ data Suffix =
 allSuffixes :: [Suffix]
 allSuffixes = [minBound .. maxBound]
 
-addSuffix :: String -> Suffix -> String
-addSuffix w sf = undefined
-
 suffixOttoman :: Suffix -> [[Otto]]
 suffixOttoman = \case
   Ler -> [[Lam, Re]]
