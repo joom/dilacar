@@ -9,26 +9,22 @@ import Orthography
 import Ottoman
 
 data Suffix =
+  -- declension
     Ler -- ler, lar
   | Den -- den, dan, ten, tan
   | In -- in, ın, un, ün
+  -- conjugation
   | Di -- di, dı, du, dü, ti, tı, tu, tü
   | Miş -- miş, mış, muş, müş
   | Ecek -- ecek, acak
+  -- derivative
+  | Siz -- siz, sız, süz, suz
+  | Lik -- lik, lık, lük, luk
   deriving (Show, Eq, Enum, Bounded)
   -- TODO a lot more suffixes to come!
 
 allSuffixes :: [Suffix]
 allSuffixes = [minBound .. maxBound]
-
-suffixOttoman :: Suffix -> [[Otto]]
-suffixOttoman = \case
-  Ler -> [[Lam, Re]]
-  Den -> [[Dal, Nun]]
-  In -> [[Kef], [Nef]]
-  Di -> [[Dal, Ye]]
-  Miş -> [[Mim, Şın]]
-  Ecek -> [[Cim, Kef], [Cim, Kaf]]
 
 morphParse :: [OttoModified] -> ([OttoModified], [Suffix])
 morphParse ((`endsWith` [Lam, Re])  -> Just x) = (x, [Ler])
@@ -39,42 +35,77 @@ morphParse ((`endsWith` [Dal, Ye])  -> Just x) = (x, [Di])
 morphParse ((`endsWith` [Mim, Şın]) -> Just x) = (x, [Miş])
 morphParse ((`endsWith` [Cim, Kef]) -> Just x) = (x, [Ecek])
 morphParse ((`endsWith` [Cim, Kaf]) -> Just x) = (x, [Ecek])
+morphParse ((`endsWith` [Sin, Ze])  -> Just x) = (x, [Siz])
+morphParse ((`endsWith` [Lam, Kef])  -> Just x) = (x, [Lik])
+morphParse ((`endsWith` [Lam, Kaf])  -> Just x) = (x, [Lik])
 morphParse letters = (letters, [])
 
 reconstruct :: [Suffix] -> String -> String
 reconstruct (x : xs) root = reconstruct xs (reconstructOne x root)
 reconstruct [] root = root
 
+-- | "kaynaştırma"
+supportive :: Suffix -> String -> String
+supportive In "su" = "y"
+supportive In _ = "n"
+supportive _ _ = error "Unimplemented supportive consonant case"
+
 reconstructOne :: Suffix -> String -> String
 reconstructOne Ler root =
   case (`elem` front) <$> lastVowel root of
     Just False -> root ++ "lar"
-    _ -> root ++ "ler"
+    _          -> root ++ "ler"
 reconstructOne Den root =
   let isFront = (`elem` front) <$> lastVowel root in
   case (isFront, needsFortis root) of
-    (Just False, True) -> root ++ "tan"
+    (Just False, True)  -> root ++ "tan"
     (Just False, False) -> root ++ "dan"
-    (_, True) -> root ++ "ten"
-    (_, False) -> root ++ "den"
+    (_, True)           -> root ++ "ten"
+    (_, False)          -> root ++ "den"
+-- TODO supportive consonants written in the Ottoman form aren't handled yet
+reconstructOne In root =
+  let isFront = (`elem` front) <$> lastVowel root in
+  let isRounded = (`elem` rounded) <$> lastVowel root in
+  let sup = case endsWithVowel root of {Nothing -> "" ; _ -> supportive In root} in
+  case (isRounded, isFront) of
+    (Just False, Just False) -> root ++ sup ++ "ın"
+    (Just False, Just True)  -> root ++ sup ++ "in"
+    (Just True, Just False)  -> root ++ sup ++ "un"
+    (Just True, Just True)   -> root ++ sup ++ "ün"
 reconstructOne Miş root =
   let isFront = (`elem` front) <$> lastVowel root in
   let isRounded = (`elem` rounded) <$> lastVowel root in
   case (isRounded, isFront) of
     (Just False, Just False) -> root ++ "mış"
-    (Just False, Just True) -> root ++ "miş"
-    (Just True, Just False) -> root ++ "muş"
-    (Just True, Just True) -> root ++ "müş"
+    (Just False, Just True)  -> root ++ "miş"
+    (Just True, Just False)  -> root ++ "muş"
+    (Just True, Just True)   -> root ++ "müş"
 reconstructOne Di root =
   let isFront = (`elem` front) <$> lastVowel root in
   let isRounded = (`elem` rounded) <$> lastVowel root in
   case (isRounded, isFront, needsFortis root) of
-    (Just False, Just False, True) -> root ++ "tı"
+    (Just False, Just False, True)  -> root ++ "tı"
     (Just False, Just False, False) -> root ++ "dı"
-    (Just False, Just True, True) -> root ++ "ti"
-    (Just False, Just True, False) -> root ++ "di"
-    (Just True, Just False, True) -> root ++ "tu"
-    (Just True, Just False, False) -> root ++ "du"
-    (Just True, Just True, True) -> root ++ "tü"
-    (Just True, Just True, False) -> root ++ "dü"
+    (Just False, Just True, True)   -> root ++ "ti"
+    (Just False, Just True, False)  -> root ++ "di"
+    (Just True, Just False, True)   -> root ++ "tu"
+    (Just True, Just False, False)  -> root ++ "du"
+    (Just True, Just True, True)    -> root ++ "tü"
+    (Just True, Just True, False)   -> root ++ "dü"
+reconstructOne Siz root =
+  let isFront = (`elem` front) <$> lastVowel root in
+  let isRounded = (`elem` rounded) <$> lastVowel root in
+  case (isRounded, isFront) of
+    (Just False, Just False) -> root ++ "sız"
+    (Just False, Just True)  -> root ++ "siz"
+    (Just True, Just False)  -> root ++ "suz"
+    (Just True, Just True)   -> root ++ "süz"
+reconstructOne Lik root =
+  let isFront = (`elem` front) <$> lastVowel root in
+  let isRounded = (`elem` rounded) <$> lastVowel root in
+  case (isRounded, isFront) of
+    (Just False, Just False) -> root ++ "lık"
+    (Just False, Just True)  -> root ++ "lik"
+    (Just True, Just False)  -> root ++ "luk"
+    (Just True, Just True)   -> root ++ "lük"
 reconstructOne _ root = error "Unimplemented suffix" -- TODO
