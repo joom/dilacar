@@ -18,8 +18,11 @@ data Suffix =
   | Miş -- miş, mış, muş, müş
   | Ecek -- ecek, acak
   -- derivative
+  | Mek -- mek, mak
   | Siz -- siz, sız, süz, suz
   | Lik -- lik, lık, lük, luk
+  | Leş -- leş, laş
+  | Cesine -- cesine, casına, çesine, çasına
   deriving (Show, Eq, Enum, Bounded)
   -- TODO a lot more suffixes to come!
 
@@ -35,9 +38,12 @@ morphParse ((`endsWith` [Dal, Ye])  -> Just x) = (x, [Di])
 morphParse ((`endsWith` [Mim, Şın]) -> Just x) = (x, [Miş])
 morphParse ((`endsWith` [Cim, Kef]) -> Just x) = (x, [Ecek])
 morphParse ((`endsWith` [Cim, Kaf]) -> Just x) = (x, [Ecek])
+morphParse ((`endsWith` [Mim, Kef])  -> Just x) = (x, [Mek])
+morphParse ((`endsWith` [Mim, Kaf])  -> Just x) = (x, [Mek])
 morphParse ((`endsWith` [Sin, Ze])  -> Just x) = (x, [Siz])
 morphParse ((`endsWith` [Lam, Kef])  -> Just x) = (x, [Lik])
 morphParse ((`endsWith` [Lam, Kaf])  -> Just x) = (x, [Lik])
+morphParse ((`endsWith` [Lam, Şın])  -> Just x) = (x, [Leş])
 morphParse letters = (letters, [])
 
 reconstruct :: [Suffix] -> String -> String
@@ -52,7 +58,8 @@ supportive _ _ = error "Unimplemented supportive consonant case"
 
 reconstructOne :: Suffix -> String -> String
 reconstructOne Ler root =
-  case (`elem` front) <$> lastVowel root of
+  let isFront = (`elem` front) <$> lastVowel root in
+  case isFront of
     Just False -> root ++ "lar"
     _          -> root ++ "ler"
 reconstructOne Den root =
@@ -92,6 +99,11 @@ reconstructOne Di root =
     (Just True, Just False, False)  -> root ++ "du"
     (Just True, Just True, True)    -> root ++ "tü"
     (Just True, Just True, False)   -> root ++ "dü"
+reconstructOne Mek root =
+  let isFront = (`elem` front) <$> lastVowel root in
+  case isFront of
+    Just False -> root ++ "mak"
+    _          -> root ++ "mek"
 reconstructOne Siz root =
   let isFront = (`elem` front) <$> lastVowel root in
   let isRounded = (`elem` rounded) <$> lastVowel root in
@@ -108,4 +120,16 @@ reconstructOne Lik root =
     (Just False, Just True)  -> root ++ "lik"
     (Just True, Just False)  -> root ++ "luk"
     (Just True, Just True)   -> root ++ "lük"
+reconstructOne Leş root =
+  let isFront = (`elem` front) <$> lastVowel root in
+  case isFront of
+    Just False -> root ++ "laş"
+    _          -> root ++ "leş"
+reconstructOne Cesine root =
+  let isFront = (`elem` front) <$> lastVowel root in
+  case (isFront, needsFortis root) of
+    (Just False, False) -> root ++ "casına"
+    (_, False)          -> root ++ "cesine"
+    (Just False, True)  -> root ++ "çasına"
+    (_, True)           -> root ++ "çesine"
 reconstructOne _ root = error "Unimplemented suffix" -- TODO

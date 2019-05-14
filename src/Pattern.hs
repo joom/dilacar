@@ -75,5 +75,6 @@ generateRegex = go True
     -- Elif with a following vowelish Ottoman letter is probably a vowel
     go True letters@((baseOtto -> Elif) : (baseOtto -> following) : rest) =
           alt (filter isVowel (ottoPat following)) <> go False rest
+          -- or not
       <|> go False letters
     go isBeginning letters = foldr1 (<>) (map pat letters)
