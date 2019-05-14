@@ -103,8 +103,8 @@
 % \usepackage{graphicx}
 % \graphicspath{ {./images/} }
 
-% \title{Morphology and lexicon-based machine translation\\of Ottoman Turkish to Modern Turkish\footnote{Version compiled on \today\ at \currenttime.}}
-\title{Morphology and lexicon-based machine translation\\of Ottoman Turkish to Modern Turkish}
+\title{Morphology and lexicon-based machine translation\\of Ottoman Turkish to Modern Turkish\footnote{Version compiled on \today\ at \currenttime.}}
+% \title{Morphology and lexicon-based machine translation\\of Ottoman Turkish to Modern Turkish}
 \author{
   Joomy Korkut\\
   \normalsize Princeton University\\
@@ -468,21 +468,67 @@ script, and there is not much we can do about that. Our program will take this
 root and decline the suffixes if there are any, and display both translations
 to the end user.
 
-\subsection{Walking through examples}
-
-\TODO{gotta write}
-
 \section{Experiments and results}
 
-\TODO{gotta write}
+There is a prototype
+implementation\footnote{\url{https://github.com/joom/dilacar}} of our system in
+the Haskell programming language. This implementation is currently missing many
+of the suffixes in the Turkish language, but it works well on simple inputs.
+Here is an input sentence we entered to our program:
+ ``\otto{ياپراقلر باخچه‌لردن دوشمش.}'' (Eng: ``Leaves fell from the gardens.'')
+For this input, we got the following output:
+
+\begin{verbatim}
+  yapraklar
+  bahçelerden
+  düşmüş, duşmuş, dövüşmüş, döşmüş
+  .
+  (2.61 secs, 15,223,379,696 bytes)
+\end{verbatim}
+
+For the first two words, our system succeeds in finding the right match. For
+the last word the correct translation is \word{düşmüş} (Eng: ``fell").
+\word{duşmuş} (Eng: ``was the shower'') and \word{döşmüş} (Eng: ``was the
+bosom'') are technically correct yet nonsensical translations.
+The correct spelling \word{dövüşmüş} has explicit vowels and consonants for the
+\emph{ö}, \emph{v} and \emph{ü} in the middle. The aggressive possible vowel
+insertion in our pattern generation assumes that these words can be spelled
+with omitted vowels. This can create incorrect translations but also if we
+encounter an exceptional spelling our system will capture it.
 
 \section{Future work}
 
-\TODO{gotta write}
+As we see above, a three word sentence can take 2.61 seconds to translate,
+which is very high. Most of this time is spent on dictionary lookups. Our
+implementation currently goes through the entire dictionary linearly and tries
+to match the entries. The Ottoman Turkish to Modern Turkish dictionary can be
+made more efficient through different methods, such as using a trie as the data
+structure. However, this would require some setup time for our program to
+populate the data structure with the dictionary content. The Turkish dictionary
+is slightly different, since our system uses regular expressions to see which
+words match the pattern, yet the paper of \citet{baeza1996fast} show that a
+special form of tries called suffix trees can help make that more efficient.
+A more established option for both dictionaries would be to compile the them
+into a finite-state transducer or machine, similar to the work of
+\citet{coltekin2010freely}.
+
+Most important enhancement for our system's overall accuracy would be better dictionaries. Current dictionaries we have are limited: the Ottoman dictionary currently has 14.000 entries, while the modern one has slightly less than 29.000. Compared to the one million words of Tura's project, even if his dictionary contains conjugations and declensions as well, our figures are low. Furthermore, the entries we have in our dictionaries are not in their ideal forms.
+In the Ottoman dictionary, translations of Arabic and Persian words use too
+many \emph{â} and \emph{î}, while the more modern spelling replaces them with
+\emph{a} and \emph{i} unless it creates ambiguity.
+In the modern dictionary, verbs are in the infinitive form instead of the root form, which currently causes problems. These problems can be solved if more time is spent on data cleaning, however we currently lack the time and manpower to do so.
 
 \section{Conclusion}
 
-\TODO{gotta write}
+In this paper, we have presented a rule-based system to translate Ottoman
+Turkish to Modern Turkish, along with a prototype implementation that
+demonstrates the feasibility of our algorithm.
+
+The main feature of our system is partial morphological parsing from the Ottoman spelling of words, taking advantage of the often more stable spellings of suffixes in Ottoman Turkish. Our program tries to parse suffixes and to search in dictionaries with what is left.
+
+This search involves two dictionaries, a more limited dictionary from Ottoman Turkish to Modern Turkish in which we search directly, and a more extensive Modern Turkish word list in which we search using a regular expression we generate from the Ottoman spelling of a presumptive root, using the orthographical rules in Ottoman Turkish.
+
+Our implementation is a testament to our claim that a rule-based solution is the right approach to translation between Ottoman Turkish and Modern Turkish, since the two languages are basically the same except the spelling rules and Modern Turkish spelling has very few exceptions.
 
 \section*{Acknowledgments}
 

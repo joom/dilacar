@@ -1,7 +1,7 @@
 # dilacar
 Machine translation system from Ottoman Turkish to Modern Turkish.
 
-Initially the final project for COS401 Introduction to Machine Translation with Srivinas Bangalore at Princeton University. The report for the project can be found [here](http://www.cs.princeton.edu/~ckorkut/papers/ottoman.pdf).
+Initially the final project for COS401 Introduction to Machine Translation with Srinivas Bangalore at Princeton University. The report for the project can be found [here](http://www.cs.princeton.edu/~ckorkut/papers/ottoman.pdf).
 
 Named after Turkish-Armenian linguist Agop Dilâçar (born Martayan), who is known for his work on the Turkish language and who was given the last name Dilâçar (literally meaning "language opener") by Mustafa Kemal Atatürk.
 
