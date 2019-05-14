@@ -82,6 +82,7 @@ instance Parse Otto where
       <|> (string "و" *> pure Vav)
       <|> (string "ه" *> pure He)
       <|> (string "ی" *> pure Ye)
+      <|> (string "ي" *> pure Ye)
 
 data Mod =
     Hemze

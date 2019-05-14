@@ -33,5 +33,20 @@ lookupOttoman letters = do
               readData (if baseEq ot' letters then (tr:l) else l) handle
             _ -> readData l handle
 
-lookupModern :: RE s a -> [String]
-lookupModern r = []
+lookupModern :: RE Char a -> IO [String]
+lookupModern r = do
+    handle <- openFile "turkDict.csv" ReadMode
+    readData [] handle
+  where
+    -- | Go through the dictionary and collect matches
+    readData :: [String] -> Handle -> IO [String]
+    readData l handle = do
+      isFileEnd <- hIsEOF handle
+      if isFileEnd
+        then return l
+        else do
+          line <- hGetLine handle
+          case line =~ r of
+            Nothing -> readData l handle
+            Just _ -> readData (line:l) handle
+

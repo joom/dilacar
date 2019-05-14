@@ -3,4 +3,7 @@ module Main where
 import Lokum
 
 main :: IO ()
-main = interact (show . entry)
+main = do
+  s <- getContents
+  res <- entry s
+  putStrLn $ show res
