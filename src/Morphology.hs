@@ -19,6 +19,7 @@ data Suffix =
   | Ecek -- ecek, acak
   -- derivative
   | Mek -- mek, mak
+  | Li -- li, lı
   | Siz -- siz, sız, süz, suz
   | Lik -- lik, lık, lük, luk
   | Leş -- leş, laş
@@ -40,6 +41,7 @@ morphParse ((`endsWith` [Cim, Kef]) -> Just x) = (x, [Ecek])
 morphParse ((`endsWith` [Cim, Kaf]) -> Just x) = (x, [Ecek])
 morphParse ((`endsWith` [Mim, Kef])  -> Just x) = (x, [Mek])
 morphParse ((`endsWith` [Mim, Kaf])  -> Just x) = (x, [Mek])
+morphParse ((`endsWith` [Lam, Ye])  -> Just x) = (x, [Li])
 morphParse ((`endsWith` [Sin, Ze])  -> Just x) = (x, [Siz])
 morphParse ((`endsWith` [Lam, Kef])  -> Just x) = (x, [Lik])
 morphParse ((`endsWith` [Lam, Kaf])  -> Just x) = (x, [Lik])
@@ -54,7 +56,7 @@ reconstruct [] root = root
 supportive :: Suffix -> String -> String
 supportive In "su" = "y"
 supportive In _ = "n"
-supportive _ _ = error "Unimplemented supportive consonant case"
+supportive _ _ = "y"
 
 reconstructOne :: Suffix -> String -> String
 reconstructOne Ler root =
@@ -104,6 +106,14 @@ reconstructOne Mek root =
   case isFront of
     Just False -> root ++ "mak"
     _          -> root ++ "mek"
+reconstructOne Li root =
+  let isFront = (`elem` front) <$> lastVowel root in
+  let isRounded = (`elem` rounded) <$> lastVowel root in
+  case (isRounded, isFront) of
+    (Just False, Just False) -> root ++ "lı"
+    (Just False, Just True)  -> root ++ "li"
+    (Just True, Just False)  -> root ++ "lu"
+    (Just True, Just True)   -> root ++ "lü"
 reconstructOne Siz root =
   let isFront = (`elem` front) <$> lastVowel root in
   let isRounded = (`elem` rounded) <$> lastVowel root in
