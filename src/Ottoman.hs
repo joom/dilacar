@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeApplications #-}
 module Ottoman where
@@ -83,7 +84,7 @@ instance Parse Otto where
       <|> (string "ه" *> pure He)
       <|> (string "ی" *> pure Ye)
       <|> (string "ى" *> pure Ye)
-      <|> (string "ي" *> pure Ye)
+      <|> (string "ي" *> pure Ye) -- only correct in middle form
 
 data Mod =
     Hemze
@@ -99,20 +100,20 @@ data Mod =
   | NonJoiner -- ^ zero-width non-joiner \8204
   deriving (Show, Eq, Enum)
 
-instance Parse Mod where
-  parse = (string "\1611" *> pure Fethateyn)
-      <|> (string "\1612" *> pure Kesrateyn)
-      <|> (string "\1613" *> pure Dammeteyn)
-      <|> (string "\1614" *> pure Üstün)
-      <|> (string "\1615" *> pure Ötre)
-      <|> (string "\1616" *> pure Esre)
-      <|> (string "\1617" *> pure Şedde)
-      <|> (string "\1618" *> pure Sükun)
-      <|> (string "\1619" *> pure Medde) -- normal size
-      <|> (string "\1620" *> pure Hemze) -- above
-      <|> (string "\1621" *> pure Hemze) -- below
-      <|> (string "\1764" *> pure Medde) -- small high
-      <|> (string "\8204" *> pure NonJoiner)
+instance Parse [Mod] where
+  parse = (string "\1611" *> pure [Fethateyn])
+      <|> (string "\1612" *> pure [Kesrateyn])
+      <|> (string "\1613" *> pure [Dammeteyn])
+      <|> (string "\1614" *> pure [Üstün])
+      <|> (string "\1615" *> pure [Ötre])
+      <|> (string "\1616" *> pure [Esre])
+      <|> (string "\1617" *> pure [Şedde])
+      <|> (string "\1618" *> pure [Sükun])
+      <|> (string "\1619" *> pure [Medde]) -- normal size
+      <|> (string "\1620" *> pure [Hemze, Üstün]) -- above
+      <|> (string "\1621" *> pure [Hemze, Esre]) -- below
+      <|> (string "\1764" *> pure [Medde]) -- small high
+      <|> (string "\8204" *> pure [NonJoiner])
 
 data OttoModified =
     PureOtto Otto
@@ -129,13 +130,15 @@ endsWith xs ys = (map fst . zip xs) <$> (stripSuffix ys (map baseOtto xs))
 instance Parse OttoModified where
   parse =
     -- Exception cases for the special Unicode characters
-    -- that stand for an Ottoman leter with a modification
-          (string "\1570" *> pure (ModifiedOtto [Medde] Elif))
-      <|> (string "آ" *> pure (ModifiedOtto [Medde] Elif))
-      <|> (string "\1571" *> pure (ModifiedOtto [Hemze] Elif)) -- Hemze above elif
-      <|> (string "\1573" *> pure (ModifiedOtto [Hemze] Elif)) -- Hemze below elif
+    -- that stand for an Ottoman letter with a modification
+          (string "آ" *> pure (ModifiedOtto [Medde] Elif))
+      <|> (string "أ" *> pure (ModifiedOtto [Hemze, Üstün] Elif))
+      <|> (string "إ" *> pure (ModifiedOtto [Hemze, Esre] Elif))
+      <|> (string "ئ" *> pure (ModifiedOtto [Hemze] Ye))
+      <|> (string "ﺌ" *> pure (ModifiedOtto [Hemze] Ye))
+      <|> (string "ﺋ" *> pure (ModifiedOtto [Hemze] Ye))
       <|> (do otto <- parse @Otto
-              mods <- many (parse @Mod)
+              mods <- concat <$> many (parse @[Mod])
               pure (ModifiedOtto mods otto))
 
 data OttoText =
@@ -148,7 +151,13 @@ baseEq xs ys = (map baseOtto xs) == (map baseOtto ys)
 
 instance Parse OttoText where
   parse = (Word <$> (spaces *> many1 (parse @OttoModified) <* spaces))
-      <|> (Punctuation <$> (string "." <|> string ","))
+      <|> (Punctuation <$> (string "." 
+                        <|> string "," 
+                        <|> string "!" 
+                        <|> string "؟" 
+                        <|> string "?" 
+                        <|> string "-" 
+                        <|> string "،"))
 
 runParser :: String -> Either Text.Parsec.ParseError [OttoText]
 runParser = Text.Parsec.parse (many parse) ""

@@ -13,6 +13,9 @@ data Suffix =
     Ler -- ler, lar
   | Den -- den, dan, ten, tan
   | In -- in, ın, un, ün
+  | M -- (i)m, (ı)m, (u)m, (ü)m
+  | Miz -- (i)miz, (ı)mız, (u)muz, (ü)müz
+  | Niz -- (i)niz, (ı)nız, (u)nuz, (ü)nüz
   -- conjugation
   | Di -- di, dı, du, dü, ti, tı, tu, tü
   | Miş -- miş, mış, muş, müş
@@ -31,24 +34,33 @@ allSuffixes :: [Suffix]
 allSuffixes = [minBound .. maxBound]
 
 morphParse :: [OttoModified] -> ([OttoModified], [Suffix])
-morphParse ((`endsWith` [Lam, Re])  -> Just x) = (x, [Ler])
-morphParse ((`endsWith` [Dal, Nun]) -> Just x) = (x, [Den])
-morphParse ((`endsWith` [Kef])      -> Just x) = (x, [In])
-morphParse ((`endsWith` [Nef])      -> Just x) = (x, [In])
-morphParse ((`endsWith` [Dal, Ye])  -> Just x) = (x, [Di])
-morphParse ((`endsWith` [Mim, Şın]) -> Just x) = (x, [Miş])
-morphParse ((`endsWith` [Cim, Kef]) -> Just x) = (x, [Ecek])
-morphParse ((`endsWith` [Cim, Kaf]) -> Just x) = (x, [Ecek])
-morphParse ((`endsWith` [Mim, Kef])  -> Just x) = (x, [Mek])
-morphParse ((`endsWith` [Mim, Kaf])  -> Just x) = (x, [Mek])
-morphParse ((`endsWith` [Lam, Ye])  -> Just x) = (x, [Li])
-morphParse ((`endsWith` [Sin, Ze])  -> Just x) = (x, [Siz])
-morphParse ((`endsWith` [Lam, Kef])  -> Just x) = (x, [Lik])
-morphParse ((`endsWith` [Lam, Kaf])  -> Just x) = (x, [Lik])
-morphParse ((`endsWith` [Lam, Şın])  -> Just x) = (x, [Leş])
+morphParse ((`endsWith` [Lam, Re])    -> Just x) = (x, [Ler])
+morphParse ((`endsWith` [Dal, Nun])   -> Just x) = (x, [Den])
+morphParse ((`endsWith` [Kef])        -> Just x) = (x, [In])
+morphParse ((`endsWith` [Nef])        -> Just x) = (x, [In])
+morphParse ((`endsWith` [Mim])        -> Just x) = (x, [M])
+morphParse ((`endsWith` [Mim, Ze])    -> Just x) = (x, [Miz])
+morphParse ((`endsWith` [Kef, Ze])    -> Just x) = (x, [Niz])
+morphParse ((`endsWith` [Nef, Ze])    -> Just x) = (x, [Niz])
+morphParse ((`endsWith` [Dal, Ye])    -> Just x) = (x, [Di])
+morphParse ((`endsWith` [Mim, Şın])   -> Just x) = (x, [Miş])
+morphParse ((`endsWith` [Elif, Cim, Kef])   -> Just x) = (x, [Ecek])
+morphParse ((`endsWith` [Elif, Cim, Kaf])   -> Just x) = (x, [Ecek])
+morphParse ((`endsWith` [Elif, Cim, Gayn])  -> Just x) = (x, [Ecek])
+morphParse ((`endsWith` [Cim, Kef])   -> Just x) = (x, [Ecek])
+morphParse ((`endsWith` [Cim, Kaf])   -> Just x) = (x, [Ecek])
+morphParse ((`endsWith` [Cim, Gayn])  -> Just x) = (x, [Ecek])
+morphParse ((`endsWith` [Mim, Kef])   -> Just x) = (x, [Mek])
+morphParse ((`endsWith` [Mim, Kaf])   -> Just x) = (x, [Mek])
+morphParse ((`endsWith` [Lam, Ye])    -> Just x) = (x, [Li])
+morphParse ((`endsWith` [Sin, Ze])    -> Just x) = (x, [Siz])
+morphParse ((`endsWith` [Lam, Kef])   -> Just x) = (x, [Lik])
+morphParse ((`endsWith` [Lam, Kaf])   -> Just x) = (x, [Lik])
+morphParse ((`endsWith` [Lam, Şın])   -> Just x) = (x, [Leş])
 morphParse letters = (letters, [])
 
 reconstruct :: [Suffix] -> String -> String
+-- reconstruct sfs root = foldl (flip reconstructOne) root sfs
 reconstruct (x : xs) root = reconstruct xs (reconstructOne x root)
 reconstruct [] root = root
 
@@ -81,6 +93,33 @@ reconstructOne In root =
     (Just False, Just True)  -> root ++ sup ++ "in"
     (Just True, Just False)  -> root ++ sup ++ "un"
     (Just True, Just True)   -> root ++ sup ++ "ün"
+reconstructOne Miz root =
+  let isFront = (`elem` front) <$> lastVowel root in
+  let isRounded = (`elem` rounded) <$> lastVowel root in
+  let sup x = case endsWithConsonant root of {Nothing -> "" ; _ -> x} in
+  case (isRounded, isFront) of
+    (Just False, Just False) -> root ++ sup "ı" ++ "mız"
+    (Just False, Just True)  -> root ++ sup "i" ++ "miz"
+    (Just True, Just False)  -> root ++ sup "u" ++ "muz"
+    (Just True, Just True)   -> root ++ sup "ü" ++ "müz"
+reconstructOne Niz root =
+  let isFront = (`elem` front) <$> lastVowel root in
+  let isRounded = (`elem` rounded) <$> lastVowel root in
+  let sup x = case endsWithConsonant root of {Nothing -> "" ; _ -> x} in
+  case (isRounded, isFront) of
+    (Just False, Just False) -> root ++ sup "ı" ++ "nız"
+    (Just False, Just True)  -> root ++ sup "i" ++ "niz"
+    (Just True, Just False)  -> root ++ sup "u" ++ "nuz"
+    (Just True, Just True)   -> root ++ sup "ü" ++ "nüz"
+reconstructOne M root =
+  let isFront = (`elem` front) <$> lastVowel root in
+  let isRounded = (`elem` rounded) <$> lastVowel root in
+  let sup x = case endsWithConsonant root of {Nothing -> "" ; _ -> x} in
+  case (isRounded, isFront) of
+    (Just False, Just False) -> root ++ sup "ı" ++ "m"
+    (Just False, Just True)  -> root ++ sup "i" ++ "m"
+    (Just True, Just False)  -> root ++ sup "u" ++ "m"
+    (Just True, Just True)   -> root ++ sup "ü" ++ "m"
 reconstructOne Miş root =
   let isFront = (`elem` front) <$> lastVowel root in
   let isRounded = (`elem` rounded) <$> lastVowel root in
@@ -89,6 +128,12 @@ reconstructOne Miş root =
     (Just False, Just True)  -> root ++ "miş"
     (Just True, Just False)  -> root ++ "muş"
     (Just True, Just True)   -> root ++ "müş"
+reconstructOne Ecek root =
+  let isFront = (`elem` front) <$> lastVowel root in
+  let sup x = case endsWithConsonant root of {Nothing -> "" ; _ -> x} in
+  case isFront of
+    Just False -> root ++ sup "a" ++ "cak"
+    _          -> root ++ sup "e" ++ "cek"
 reconstructOne Di root =
   let isFront = (`elem` front) <$> lastVowel root in
   let isRounded = (`elem` rounded) <$> lastVowel root in

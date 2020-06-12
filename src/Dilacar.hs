@@ -9,6 +9,7 @@ import qualified Morphology as Morph
 import qualified Ottoman as Otto
 import qualified Pattern as Pat
 import qualified Dictionary as Dict
+import Types
 
 type Result = [String]
 
