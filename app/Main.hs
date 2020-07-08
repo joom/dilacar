@@ -1,13 +1,16 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import Data.List
+import qualified Data.Text as T
+import qualified Data.Text.IO as T
 
 import Dilacar
 
 main :: IO ()
-main = getContents >>= run
+main = T.getContents >>= run
 
-run :: String -> IO ()
+run :: T.Text -> IO ()
 run s = do
   res <- entry s
-  putStrLn $ intercalate "\n" (map (intercalate ", ") res)
+  -- putStrLn $ intercalate "\n" (map (intercalate ", ") res)
+  T.putStrLn $ T.intercalate "\n" (map (T.intercalate ", ") res)

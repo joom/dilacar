@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeApplications #-}
 module Dilacar where
 
-import Data.List
+import qualified Data.Text as T
 
 import qualified Orthography as Ortho
 import qualified Morphology as Morph
@@ -11,7 +11,7 @@ import qualified Pattern as Pat
 import qualified Dictionary as Dict
 import Types
 
-type Result = [String]
+type Result = [T.Text]
 
 translate :: Otto.OttoText -> IO Result
 translate (Otto.Punctuation s) = return [s]
@@ -37,7 +37,7 @@ translate (Otto.Word letters) = loop letters []
                     -- TODO report that translation failed
                     [] -> if null sufs then return [] else loop presumptiveRoot allSufs
 
-entry :: String -> IO [Result]
+entry :: T.Text -> IO [Result]
 entry s = case Otto.runParser s of
             Left err -> return []
             Right ws -> mapM translate ws

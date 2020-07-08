@@ -1,12 +1,16 @@
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE ViewPatterns #-}
 module Morphology where
 
-import Data.List
+import qualified Data.Text as T
+import Prelude hiding ((++))
 
 import Orthography
 import Ottoman
+
+(++) = T.append
 
 data Suffix =
   -- declension
@@ -59,18 +63,18 @@ morphParse ((`endsWith` [Lam, Kaf])   -> Just x) = (x, [Lik])
 morphParse ((`endsWith` [Lam, Şın])   -> Just x) = (x, [Leş])
 morphParse letters = (letters, [])
 
-reconstruct :: [Suffix] -> String -> String
+reconstruct :: [Suffix] -> T.Text -> T.Text
 -- reconstruct sfs root = foldl (flip reconstructOne) root sfs
 reconstruct (x : xs) root = reconstruct xs (reconstructOne x root)
 reconstruct [] root = root
 
 -- | "kaynaştırma"
-supportive :: Suffix -> String -> String
+supportive :: Suffix -> T.Text -> T.Text
 supportive In "su" = "y"
 supportive In _ = "n"
 supportive _ _ = "y"
 
-reconstructOne :: Suffix -> String -> String
+reconstructOne :: Suffix -> T.Text -> T.Text
 reconstructOne Ler root =
   let isFront = (`elem` front) <$> lastVowel root in
   case isFront of

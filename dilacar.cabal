@@ -26,12 +26,12 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5,
-      transformers,
-      parsec,
-      extra,
-      split,
-      regex-applicative
+      base >=4.7 && <5
+    , transformers
+    , text
+    , parsec
+    , extra
+    , regex-applicative
   default-language: Haskell2010
 
 executable dilacar-exe
@@ -44,6 +44,7 @@ executable dilacar-exe
   build-depends:
       base >=4.7 && <5
     , dilacar
+    , text
   default-language: Haskell2010
 
 test-suite dilacar-test

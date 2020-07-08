@@ -3,6 +3,9 @@
 module Orthography where
 
 import qualified Data.Char as C
+import qualified Data.Text as T
+
+(+++) = T.append
 
 alphabet :: [Char]
 alphabet = "abcçdefgğhıijklmnoöprsştuüvyz"
@@ -69,16 +72,20 @@ instance Orthographic String where
   isVowel = all isVowel
   isConsonant = all isConsonant
 
-lastVowel :: String -> Maybe Char
-lastVowel s = case filter isVowel s of
-                [] -> Nothing
-                xs -> Just (last xs)
+instance Orthographic T.Text where
+  isVowel = T.all isVowel
+  isConsonant = T.all isConsonant
 
-endsWithVowel :: String -> Maybe Char
-endsWithVowel s = if isVowel (last s) then Just (last s) else Nothing
+lastVowel :: T.Text -> Maybe Char
+lastVowel s = case T.filter isVowel s of
+                xs | T.null xs -> Nothing
+                xs -> Just (T.last xs)
 
-endsWithConsonant :: String -> Maybe Char
-endsWithConsonant s = if isConsonant (last s) then Just (last s) else Nothing
+endsWithVowel :: T.Text -> Maybe Char
+endsWithVowel s = if isVowel (T.last s) then Just (T.last s) else Nothing
+
+endsWithConsonant :: T.Text -> Maybe Char
+endsWithConsonant s = if isConsonant (T.last s) then Just (T.last s) else Nothing
 
 lenition :: Char -> Char
 lenition 'p' = 'b'
@@ -93,19 +100,19 @@ fortition 'g' = 'k'
 
 -- | Check if there should be consonant lenition (yumuşama)
 -- Return the new root if yes.
-shouldBeLenition :: String -> Maybe String
+shouldBeLenition :: T.Text -> Maybe T.Text
 shouldBeLenition s =
-  if last s `elem` nonContinuant
-    then Just $ init s ++ [lenition (last s)]
+  if T.last s `elem` nonContinuant
+    then Just $ T.snoc (T.init s) (lenition (T.last s))
     else Nothing
 
 -- | Check if there should be fortitive assimilation (sertleşme)
 -- Return the new root if yes.
-shouldBeFortition :: String -> Maybe String
+shouldBeFortition :: T.Text -> Maybe T.Text
 shouldBeFortition s =
-  if last s `elem` "cdg"
-    then Just $ init s ++ [lenition (last s)]
+  if T.last s `elem` ("cdg" :: [Char])
+    then Just $ T.snoc (T.init s) (lenition (T.last s))
     else Nothing
 
-needsFortis :: String -> Bool
-needsFortis s = last s `elem` nonContinuant
+needsFortis :: T.Text -> Bool
+needsFortis s = T.last s `elem` nonContinuant

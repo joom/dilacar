@@ -3,12 +3,15 @@
 {-# LANGUAGE TypeApplications #-}
 module Ottoman where
 
-import Data.List
 import Data.List.Extra
 
-import Text.Parsec.String (Parser(..))
+import qualified Data.Text as T
+import Text.Parsec.Text (Parser(..))
 import Text.Parsec ((<|>), string, many, many1, spaces)
 import qualified Text.Parsec
+
+text :: String -> Parser T.Text
+text s = T.pack <$> string s
 
 class Parse a where
   parse :: Parser a
@@ -143,7 +146,7 @@ instance Parse OttoModified where
 
 data OttoText =
     Word [OttoModified]
-  | Punctuation String
+  | Punctuation T.Text
   deriving (Show, Eq)
 
 baseEq :: [OttoModified] -> [OttoModified] -> Bool
@@ -151,13 +154,13 @@ baseEq xs ys = (map baseOtto xs) == (map baseOtto ys)
 
 instance Parse OttoText where
   parse = (Word <$> (spaces *> many1 (parse @OttoModified) <* spaces))
-      <|> (Punctuation <$> (string "." 
-                        <|> string "," 
-                        <|> string "!" 
-                        <|> string "؟" 
-                        <|> string "?" 
-                        <|> string "-" 
-                        <|> string "،"))
+      <|> (Punctuation <$> (text "." 
+                        <|> text "," 
+                        <|> text "!" 
+                        <|> text "؟" 
+                        <|> text "?" 
+                        <|> text "-" 
+                        <|> text "،"))
 
-runParser :: String -> Either Text.Parsec.ParseError [OttoText]
+runParser :: T.Text -> Either Text.Parsec.ParseError [OttoText]
 runParser = Text.Parsec.parse (many parse) ""
